@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->id();
             //transaction time
             $table->timestamp('transaction_time');
             //total price
