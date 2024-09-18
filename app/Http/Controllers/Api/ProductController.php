@@ -13,15 +13,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        //all products
+        $products = \App\Models\Product::orderBy('id', 'desc')->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Product',
+            'data' => $products
+        ], 200);
     }
 
     /**
@@ -29,21 +27,45 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:3',
+            'price' => 'required|integer',
+            'stock' => 'required|integer',
+            'category_id' => 'required',
+            'image' => 'required|image|mimes:png,jpg,jpeg'
+        ]);
+
+        $filename = time() . '.' . $request->image->extension();
+        $request->image->storeAs('public/products', $filename);
+        $category = \App\Models\Category::where('id', $request->category_id)->first();
+        $product = \App\Models\Product::create([
+            'name' => $request->name,
+            'price' => (int) $request->price,
+            'stock' => (int) $request->stock,
+            'category_id' => $request->category_id,
+            'category' => $category->name,
+            'image' => $filename,
+            'is_favorite' => $request->is_favorite
+        ]);
+
+        if ($product) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product Created',
+                'data' => $product
+            ], 201);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product Failed to Save',
+            ], 409);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
+    public function show(string $id)
     {
         //
     }
@@ -51,7 +73,7 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -59,8 +81,14 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy(string $id)
     {
         //
+        $product = \App\Models\Product::find($id);
+        $product->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Product Deleted'
+        ], 200);
     }
 }

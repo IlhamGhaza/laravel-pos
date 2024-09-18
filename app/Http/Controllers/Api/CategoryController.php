@@ -13,7 +13,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return response()->json([
+            'status' => true,
+            'message' => 'List data categories',
+            'data' => $categories
+        ]);
     }
 
     /**
