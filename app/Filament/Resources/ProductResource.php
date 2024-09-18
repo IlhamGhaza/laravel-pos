@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class ProductResource extends Resource
 {
@@ -34,7 +35,7 @@ class ProductResource extends Resource
                     ->required()
                     ->numeric()
                     ->default(0)
-                    ->prefix('$'),
+                    ->prefix('Rp'),
                 Forms\Components\TextInput::make('stock')
                     ->required()
                     ->numeric()
@@ -46,7 +47,14 @@ class ProductResource extends Resource
                     ->searchable(),
                 Forms\Components\FileUpload::make('image')
                     ->disk('products')
-                    ->image(),
+                    ->image()
+                    ->imageEditor()
+                    ->imageEditorAspectRatios([
+                        null,
+                        '16:9',
+                        '4:3',
+                        '1:1',
+                    ]),
                 Forms\Components\Toggle::make('is_best_seller')
                     ->required(),
             ]);
@@ -61,7 +69,7 @@ class ProductResource extends Resource
                     ->toggleable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
+                    ->prefix('Rp ')
                     ->searchable()
                     ->toggleable()
                     ->sortable(),
@@ -75,6 +83,7 @@ class ProductResource extends Resource
                     ->toggleable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image')
+
                     ->disk('products'),
                 Tables\Columns\IconColumn::make('is_best_seller')
                     ->boolean(),
