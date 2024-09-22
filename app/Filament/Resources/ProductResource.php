@@ -83,8 +83,9 @@ class ProductResource extends Resource
                     ->toggleable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image')
-
-                    ->disk('products'),
+                    ->getStateUsing(fn ($record) => $record->image ? asset('storage/products/' . ltrim($record->image, '/')) : null)
+                    ->disk('products')
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_best_seller')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
