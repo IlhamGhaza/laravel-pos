@@ -78,7 +78,8 @@ class OrderResource extends Resource
                     ->badge()
                     ->color(function (Order $record) {
                         return match ($record->payment_method) {
-                            'Cash' => 'success',
+                            //customize here
+                            'cash' => 'success',
                             'Credit' => 'primary',
                             'Debit' => 'primary',
                             'Transfer' => 'primary',

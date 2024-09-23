@@ -67,12 +67,13 @@ class UserResource extends Resource
                     ->label('Role')
                     ->badge()
                     ->color(function (User $record) {
+                        error_log('Role: ' . $record->role);
                         return match ($record->role) {
                             'super_admin' => 'danger',
                             'admin' => 'danger',
                             'staff' => 'warning',
                             'user' => 'primary',
-                            default => 'primary',
+                            default => 'secondary',
                         };
                     })
                     ->searchable()->sortable()->toggleable(),
