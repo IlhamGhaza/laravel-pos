@@ -37,13 +37,13 @@ class ProductController extends Controller
 
         $filename = time() . '.' . $request->image->extension();
         $request->image->storeAs('public/products', $filename);
-        \App\Models\Category::where('id', $request->category_id)->first();
+        $category = \App\Models\Category::where('id', $request->category_id)->first();
         $product = \App\Models\Product::create([
             'name' => $request->name,
             'price' => (int) $request->price,
             'stock' => (int) $request->stock,
             'category_id' => $request->category_id,
-            // 'category' => $category->name,
+            'category' => $category->name,
             'image' => $filename,
             'is_favorite' => $request->is_favorite
         ]);
