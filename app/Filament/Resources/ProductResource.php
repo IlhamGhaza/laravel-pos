@@ -54,7 +54,8 @@ class ProductResource extends Resource
                         '16:9',
                         '4:3',
                         '1:1',
-                    ]),
+                    ])
+                    ->required(),
                 Forms\Components\Toggle::make('is_best_seller')
                     ->required(),
             ]);
