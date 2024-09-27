@@ -21,6 +21,8 @@ return new class extends Migration
             //stock
             $table->integer('stock')->default(0);
             //category enum (food, drink, snack)
+            $table->enum('category', ['food', 'drink', 'snack']);
+            //category_id
             $table->foreignId('category_id')->constrained('categories');
             //image
             $table->string('image')->nullable();
