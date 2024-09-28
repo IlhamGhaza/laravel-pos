@@ -59,19 +59,25 @@ This is a Point of Sale (POS) system built with Laravel and Filament.
    php artisan migrate
    ```
 
-8. Seed the database (optional):
+   or
+   
+   ```bash
+   php artisan migrate:fresh --seed 
+   ```
+
+9. Seed the database (optional):
 
    ```bash
    php artisan db:seed
    ```
 
-9. Compile assets:
+10. Compile assets:
 
     ```bash
     npm run dev
     ```
 
-10. Start the development server:
+11. Start the development server:
 
     ```bash
     php artisan serve
