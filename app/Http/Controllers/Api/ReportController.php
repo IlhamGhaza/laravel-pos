@@ -127,12 +127,12 @@ class ReportController extends Controller
 
         $owner = User::where('roles', 'admin')->first();
 
-        Resend::emails()->send([
-            'from' => 'JagoFlutter <pos@heticket.com>',
-            'to' => [$owner->email],
-            'subject' => 'Report Harian - ' . now()->format('Y-m-d'),
-            'html' => (new OrderShipped($dataReport, $totalProductSold))->render(),
-        ]);
+        // Resend::emails()->send([
+        //     'from' => 'JagoFlutter <pos@heticket.com>',
+        //     'to' => [$owner->email],
+        //     'subject' => 'Report Harian - ' . now()->format('Y-m-d'),
+        //     'html' => (new OrderShipped($dataReport, $totalProductSold))->render(),
+        // ]);
         //
         // Mengirim respon
         return response()->json([

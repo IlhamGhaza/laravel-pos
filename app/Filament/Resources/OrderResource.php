@@ -19,7 +19,7 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationGroup = 'Order Management';
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -27,6 +27,21 @@ class OrderResource extends Resource
             ->schema([
                 Forms\Components\DateTimePicker::make('transaction_time')
                     ->required(),
+                Forms\Components\TextInput::make('payment_amount')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('sub_total')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('tax')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('discount')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('service_charge')
+                    ->required()
+                    ->numeric(),
                 Forms\Components\TextInput::make('total_price')
                     ->required()
                     ->numeric(),
@@ -57,6 +72,20 @@ class OrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('transaction_time')
                     ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payment_amount')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('sub_total')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('tax')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('discount')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('service_charge')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->numeric()
