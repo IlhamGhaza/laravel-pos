@@ -27,6 +27,7 @@ return new class extends Migration
             //image
             $table->string('image')->nullable();
             $table->boolean('is_best_seller')->default(false);
+            $table->boolean('isReady')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
