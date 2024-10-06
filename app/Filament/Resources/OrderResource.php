@@ -47,8 +47,7 @@ class OrderResource extends Resource
                         'E-Wallet' => 'E-Wallet',
                         'QRIS' => 'QRIS',
                     ])
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
             ]);
     }
 
