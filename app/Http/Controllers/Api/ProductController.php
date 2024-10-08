@@ -13,11 +13,12 @@ class ProductController extends Controller
     public function index()
     {
         //all products
-        $products = \App\Models\Product::orderBy('id', 'desc')->get();
+        $products = \App\Models\Product::where('stock', '>', 0)->orderBy('id', 'desc')->get();
+
         return response()->json([
             'success' => true,
             'message' => 'List Data Product',
-            'data' => $products
+            'data' => $products,
         ], 200);
     }
 
@@ -31,10 +32,10 @@ class ProductController extends Controller
             'price' => 'required|integer',
             'stock' => 'required|integer',
             'category_id' => 'required',
-            'image' => 'required|image|mimes:png,jpg,jpeg'
+            'image' => 'required|image|mimes:png,jpg,jpeg',
         ]);
 
-        $filename = time() . '.' . $request->image->extension();
+        $filename = time().'.'.$request->image->extension();
         $request->image->storeAs('public/products', $filename);
         $category = \App\Models\Category::where('id', $request->category_id)->first();
         $product = \App\Models\Product::create([
@@ -44,14 +45,14 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
             'category' => $category->name,
             'image' => $filename,
-            'is_favorite' => $request->is_favorite
+            'is_favorite' => $request->is_favorite,
         ]);
 
         if ($product) {
             return response()->json([
                 'success' => true,
                 'message' => 'Product Created',
-                'data' => $product
+                'data' => $product,
             ], 201);
         } else {
             return response()->json([
