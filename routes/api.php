@@ -17,4 +17,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/summary', [App\Http\Controllers\Api\ReportController::class, 'summary']);
     Route::get('/reports/product-sales', [App\Http\Controllers\Api\ReportController::class, 'productSales']);
     Route::get('/reports/close-cashier', [App\Http\Controllers\Api\ReportController::class, 'closeCashier']);
+    //discount resorce
+    Route::apiResource('discounts', \App\Http\Controllers\Api\DiscountController::class);
 });
