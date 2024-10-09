@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,14 +11,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Storage;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
+
     protected static ?string $navigationGroup = 'Product Management';
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -84,7 +84,7 @@ class ProductResource extends Resource
                     ->toggleable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image')
-                    ->getStateUsing(fn ($record) => $record->image ? asset('storage/products/' . ltrim($record->image, '/')) : null)
+                    ->getStateUsing(fn ($record) => $record->image ? asset('storage/products/'.ltrim($record->image, '/')) : null)
                     ->disk('products')
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('is_best_seller')
@@ -110,9 +110,9 @@ class ProductResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make('Restore')
-                ->color('success'),
+                    ->color('success'),
                 Tables\Actions\ForceDeleteAction::make('ForceDelete')
-                ->color('danger'),
+                    ->color('danger'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
