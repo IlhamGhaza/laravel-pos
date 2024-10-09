@@ -22,7 +22,7 @@ class DiscountController extends Controller
         // }
 
         //or
-         $discounts = Discount::where('expires_at', '>=', Carbon::now())->get(); //use this
+        $discounts = Discount::where('expired_date', '>=', Carbon::now())->get(); //use this
 
         return response(['message' => 'success', 'data' => $discounts], 200);
     }
