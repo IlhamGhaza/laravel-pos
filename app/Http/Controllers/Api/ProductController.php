@@ -76,6 +76,7 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         //
+
     }
 
     /**
@@ -84,5 +85,32 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         //
+        // $product = \App\Models\Product::find($id);
+        // $product->delete();
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Product Deleted'
+        // ], 200);
+
+        $product = \App\Models\Product::find($id);
+
+        if ($product) {
+            if ($product->delete()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product Deleted Successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to Delete Product',
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product Not Found',
+            ], 404);
+        }
     }
 }

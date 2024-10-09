@@ -42,7 +42,7 @@ class DiscountController extends Controller
 
         $discounts = Discount::create($request->all());
 
-        return response()->json(['status' => 'success', 'data' => $discounts], 200);
+        return response()->json(['status' => 'success', 'message' => 'Order Created', 'data' => $discounts], 200);
     }
 
     //update
@@ -82,18 +82,27 @@ class DiscountController extends Controller
     }
 
     //destroy
-    public function destroy(Request $request)
+    public function destroy(string $id)
     {
-        $discounts = Discount::where('id', $request->id)->first();
+        $discount = \App\Models\discount::find($id);
 
-        if (! $discounts) {
-            return response()->json(['status' => 'error', 'message' => 'Discount not found'], 404);
+        if ($discount) {
+            if ($discount->delete()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'discount Deleted Successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to Delete discount',
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'discount Not Found',
+            ], 404);
         }
-
-        $discounts = Discount::where('id', $request->id)->delete();
-
-        return response()->json(['status' => 'success',
-            'message' => 'Discount deleted successfully'],
-            200);
     }
 }
