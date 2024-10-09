@@ -38,12 +38,12 @@ class DiscountResource extends Resource
                 Forms\Components\TextInput::make('value')
                     ->required()
                     ->numeric(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                    ])
-                    ->required(),
+                // Forms\Components\Select::make('status')
+                //     ->options([
+                //         'active' => 'Active',
+                //         'inactive' => 'Inactive',
+                //     ])
+                //     ->required(),
                 Forms\Components\DatePicker::make('expired_date')
                     // ->preload()
                     // ->searchable()
