@@ -15,7 +15,7 @@ return new class extends Migration
          Schema::table('products', function (Blueprint $table) {
             DB::statement('ALTER TABLE products MODIFY category VARCHAR(255)');
             //categoryid
-            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable()->after('category');
         });
     }
 
