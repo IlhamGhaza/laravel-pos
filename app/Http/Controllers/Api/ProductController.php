@@ -27,38 +27,58 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|min:3',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
-            'category_id' => 'required',
-            'image' => 'required|image|mimes:png,jpg,jpeg',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|min:3',
+                'price' => 'required|integer',
+                'stock' => 'required|integer',
+                'category_id' => 'required|exists:categories,id',
+                'image' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            ]);
 
-        $filename = time().'.'.$request->image->extension();
-        $request->image->storeAs('public/products', $filename);
-        $category = \App\Models\Category::where('id', $request->category_id)->first();
-        $product = \App\Models\Product::create([
-            'name' => $request->name,
-            'price' => (int) $request->price,
-            'stock' => (int) $request->stock,
-            'category_id' => $request->category_id,
-            'category' => $category->name,
-            'image' => $filename,
-            'is_favorite' => $request->is_favorite,
-        ]);
+            $filename = time().'.'.$request->image->extension();
+            $request->image->storeAs('public/products', $filename);
 
-        if ($product) {
+            $category = \App\Models\Category::findOrFail($request->category_id);
+
+            $product = \App\Models\Product::create([
+                'name' => $request->name,
+                'price' => (int) $request->price,
+                'stock' => (int) $request->stock,
+                'category_id' => $request->category_id,
+                'category' => $category->name,
+                'image' => $filename,
+                'is_favorite' => $request->is_favorite ?? false,
+            ]);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Product Created',
+                'message' => 'Product Created Successfully',
                 'data' => $product,
             ], 201);
-        } else {
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product Failed to Save',
-            ], 409);
+                'message' => 'Validation Error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category Not Found',
+            ], 404);
+        } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error Uploading Image',
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 

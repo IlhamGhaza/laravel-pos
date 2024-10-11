@@ -18,13 +18,13 @@ class AuthController extends Controller
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response([
-                'message' => $e->errors(),
+                'message' => 'Validation failed, please check your input again',
             ], 422);
         }
 
         if (empty($request->email) || empty($request->password)) {
             return response([
-                'message' => ['Email and password are required'],
+                'message' => 'Email and password are required',
             ], 400);
         }
 
@@ -32,13 +32,13 @@ class AuthController extends Controller
 
         if (! $user) {
             return response([
-                'message' => ['Email not found'],
+                'message' => 'Email not found',
             ], 404);
         }
 
         if (! Hash::check($request->password, $user->password)) {
             return response([
-                'message' => ['Password is incorrect'],
+                'message' => 'Password is incorrect',
             ], 401);
         }
 
