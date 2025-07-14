@@ -1,0 +1,51 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name',100);
+            //description
+            $table->text('description')->nullable();
+            //price
+            $table->integer('price')->default(0);
+            //stock
+            $table->integer('stock')->default(0);
+            //category enum (food, drink, snack)
+            $table->string('category');
+            // //category_id
+            // $table->foreignId('category_id')->constrained('categories');
+            //image
+            $table->string('image');
+            $table->boolean('is_best_seller')->default(false);
+            $table->boolean('isReady')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Indeks untuk performa
+            $table->index('name');
+            $table->index('price');
+            $table->index('stock');
+            $table->index('is_best_seller');
+            $table->index('isReady');
+            $table->index('created_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};
