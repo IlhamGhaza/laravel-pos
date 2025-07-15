@@ -16,6 +16,7 @@ class CustomerController extends Controller
 
     public function index()
     {
+        $this->authorize('viewAny', Customer::class);
         return Customer::all();
     }
 
@@ -27,6 +28,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Customer::class);
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -55,11 +57,10 @@ class CustomerController extends Controller
                 'message' => 'Pelanggan berhasil ditambahkan',
                 'data' => $customer
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal menambahkan pelanggan: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menambahkan pelanggan',
@@ -70,6 +71,7 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
+        $this->authorize('view', $customer);
         return $customer;
     }
 
@@ -82,6 +84,7 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
+        $this->authorize('update', $customer);
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required|string|max:255',
@@ -110,11 +113,10 @@ class CustomerController extends Controller
                 'message' => 'Data pelanggan berhasil diperbarui',
                 'data' => $customer
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal memperbarui pelanggan: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memperbarui pelanggan',
@@ -131,6 +133,7 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        $this->authorize('delete', $customer);
         try {
             // Begin database transaction
             DB::beginTransaction();
@@ -147,14 +150,13 @@ class CustomerController extends Controller
                 'message' => 'Customer deleted successfully',
                 'data' => null
             ]);
-
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            
+
             // Log the error
             Log::error('Failed to delete customer: ' . $e->getMessage());
-            
+
             // Return error response
             return response()->json([
                 'success' => false,

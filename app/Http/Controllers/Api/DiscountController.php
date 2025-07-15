@@ -18,6 +18,7 @@ class DiscountController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', \App\Models\Discount::class);
         try {
             // Ambil diskon aktif dengan relasi validDays untuk performa
             $discounts = Discount::with('validDays')
@@ -53,6 +54,7 @@ class DiscountController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', \App\Models\Discount::class);
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -142,6 +144,7 @@ class DiscountController extends Controller
 
     public function update(Request $request, Discount $discount) // Use Route Model Binding
     {
+        $this->authorize('update', $discount);
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -233,6 +236,7 @@ class DiscountController extends Controller
 
     public function show(Discount $discount) // Use Route Model Binding
     {
+        $this->authorize('view', $discount);
         try {
             $discount->load('validDays');
 
@@ -260,6 +264,7 @@ class DiscountController extends Controller
 
     public function destroy(Discount $discount) // Use Route Model Binding
     {
+        $this->authorize('delete', $discount);
         try {
             DB::beginTransaction();
 

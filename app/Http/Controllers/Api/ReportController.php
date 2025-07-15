@@ -16,6 +16,7 @@ class ReportController extends Controller
 {
     public function summary(Request $request)
     {
+        $this->authorize('viewAny', \App\Models\Order::class);
         $validator = Validator::make($request->all(), [
             'start_date' => 'required|date_format:Y-m-d',
             'end_date' => 'required|date_format:Y-m-d|after_or_equal:start_date',
@@ -56,6 +57,7 @@ class ReportController extends Controller
 
     public function productSales(Request $request)
     {
+        $this->authorize('viewAny', \App\Models\OrderItem::class);
         $validator = Validator::make($request->all(), [
             'start_date' => 'required|date_format:Y-m-d',
             'end_date' => 'required|date_format:Y-m-d|after_or_equal:start_date',
@@ -93,6 +95,7 @@ class ReportController extends Controller
     //closecashier
     public function closeCashier(Request $request)
     {
+        $this->authorize('viewAny', \App\Models\Order::class);
         $start_date = date('Y-m-d 00:00:00');
         $end_date = date('Y-m-d 23:59:59');
 

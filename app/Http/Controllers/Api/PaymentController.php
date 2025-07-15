@@ -221,6 +221,7 @@ class PaymentController extends Controller
      */
     public function createPayment(Request $request)
     {
+        $this->authorize('create', \App\Models\Payment::class);
         $response = [
             'success' => false,
             'message' => 'Gagal memproses pembayaran',
@@ -335,6 +336,7 @@ class PaymentController extends Controller
     public function paymentHistory(Request $request)
     {
         try {
+            $this->authorize('viewAny', \App\Models\Payment::class);
             $perPage = $request->input('per_page', 15);
             $payments = \App\Models\Payment::with(['order', 'user'])
                 ->orderBy('created_at', 'desc')
@@ -346,7 +348,7 @@ class PaymentController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to fetch payment history: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal mengambil riwayat pembayaran',

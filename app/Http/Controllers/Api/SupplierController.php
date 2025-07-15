@@ -24,6 +24,7 @@ class SupplierController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', \App\Models\Supplier::class);
         try {
             $perPage = $request->input('per_page', self::PER_PAGE);
             $sortField = $request->input('sort_by', 'name');
@@ -46,7 +47,7 @@ class SupplierController extends Controller
             $validSortFields = ['name', 'company_name', 'created_at', 'status'];
             $sortField = in_array($sortField, $validSortFields) ? $sortField : 'name';
             $sortOrder = strtolower($sortOrder) === 'desc' ? 'desc' : 'asc';
-            
+
             $suppliers = $query->orderBy($sortField, $sortOrder)
                              ->paginate($perPage);
 
@@ -65,7 +66,7 @@ class SupplierController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Failed to fetch suppliers: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal mengambil data supplier',
@@ -82,6 +83,7 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', \App\Models\Supplier::class);
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -109,9 +111,9 @@ class SupplierController extends Controller
             }
 
             DB::beginTransaction();
-            
+
             $supplier = Supplier::create($validator->validated());
-            
+
             DB::commit();
 
             return $this->buildResponse([
@@ -123,7 +125,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to create supplier: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal menambahkan supplier',
@@ -140,6 +142,7 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
+        $this->authorize('view', $supplier);
         try {
             return $this->buildResponse([
                 'success' => true,
@@ -147,7 +150,7 @@ class SupplierController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to fetch supplier: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal mengambil detail supplier',
@@ -165,6 +168,7 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
+        $this->authorize('update', $supplier);
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required|string|max:255',
@@ -192,9 +196,9 @@ class SupplierController extends Controller
             }
 
             DB::beginTransaction();
-            
+
             $supplier->update($validator->validated());
-            
+
             DB::commit();
 
             return $this->buildResponse([
@@ -206,7 +210,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update supplier: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal memperbarui data supplier',
@@ -223,9 +227,10 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
+        $this->authorize('delete', $supplier);
         try {
             DB::beginTransaction();
-            
+
             // Check if supplier has related records before deleting
             if ($supplier->purchaseOrders()->exists()) {
                 return $this->buildResponse([
@@ -233,9 +238,9 @@ class SupplierController extends Controller
                     'message' => 'Tidak dapat menghapus supplier yang memiliki riwayat pembelian'
                 ], 422);
             }
-            
+
             $supplier->delete();
-            
+
             DB::commit();
 
             return $this->buildResponse([
@@ -246,7 +251,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to delete supplier: ' . $e->getMessage());
-            
+
             return $this->buildResponse([
                 'success' => false,
                 'message' => 'Gagal menghapus supplier',

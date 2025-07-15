@@ -18,6 +18,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Category::class);
         $categories = Category::all();
 
         return response()->json([
@@ -35,6 +36,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Category::class);
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255|unique:categories,name',
@@ -87,6 +89,7 @@ class CategoryController extends Controller
                 'message' => 'Category not found'
             ], 404);
         }
+        $this->authorize('view', $category);
 
         return response()->json([
             'success' => true,
@@ -115,6 +118,7 @@ class CategoryController extends Controller
                 ];
                 return response()->json($response, 404);
             }
+            $this->authorize('update', $category);
 
             $validator = Validator::make($request->all(), [
                 'name' => [
@@ -179,6 +183,7 @@ class CategoryController extends Controller
                 ];
                 return response()->json($response, 404);
             }
+            $this->authorize('delete', $category);
 
             // Cek apakah kategori memiliki produk
             if ($category->products()->exists()) {

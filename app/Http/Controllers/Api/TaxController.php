@@ -16,6 +16,7 @@ class TaxController extends Controller
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\Tax::class);
         try {
             $taxes = Tax::all();
 
@@ -38,6 +39,7 @@ class TaxController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\Tax::class);
         try {
             $validated = $request->validate([
                 'name' => 'required|string|min:3|max:255',
@@ -74,6 +76,7 @@ class TaxController extends Controller
      */
     public function show(Tax $tax): JsonResponse
     {
+        $this->authorize('view', $tax);
 
 
         return response()->json([
@@ -88,6 +91,7 @@ class TaxController extends Controller
      */
     public function update(Request $request, Tax $tax): JsonResponse
     {
+        $this->authorize('update', $tax);
         try {
             $validated = $request->validate([
                 'name' => 'sometimes|required|string|min:3|max:255',
@@ -121,6 +125,7 @@ class TaxController extends Controller
      */
     public function destroy(Tax $tax): JsonResponse
     {
+        $this->authorize('delete', $tax);
         try {
             $tax->delete();
 

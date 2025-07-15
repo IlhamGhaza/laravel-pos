@@ -31,24 +31,25 @@ class SyncController extends Controller
      */
     public function getLastSync(Request $request)
     {
+        $this->authorize('create', \App\Models\Product::class);
         $models = $request->input('models', array_keys($this->syncableModels));
-        
+
         $result = [];
-        
+
         foreach ($models as $model) {
             if (!isset($this->syncableModels[$model])) {
                 continue;
             }
-            
+
             $modelClass = $this->syncableModels[$model];
             $lastSync = $modelClass::max('updated_at');
-            
+
             $result[$model] = [
                 'last_sync' => $lastSync ? (is_string($lastSync) ? $lastSync : $lastSync->toIso8601String()) : null,
                 'count' => $modelClass::count(),
             ];
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => $result,
@@ -60,6 +61,7 @@ class SyncController extends Controller
      */
     public function pushChanges(Request $request)
     {
+        $this->authorize('create', \App\Models\Product::class);
         $validator = Validator::make($request->all(), [
             'changes' => 'required|array',
             'changes.*.model' => 'required|in:' . implode(',', array_keys($this->syncableModels)),
@@ -75,10 +77,10 @@ class SyncController extends Controller
         }
 
         $results = [];
-        
+
         foreach ($request->changes as $change) {
             $modelClass = $this->syncableModels[$change['model']];
-            
+
             try {
                 $results[$change['model']] = $this->syncService->syncChanges(
                     $change['data'],
@@ -90,7 +92,7 @@ class SyncController extends Controller
                 ];
             }
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => $results,
@@ -102,6 +104,7 @@ class SyncController extends Controller
      */
     public function pullChanges(Request $request)
     {
+        $this->authorize('create', \App\Models\Product::class);
         $validator = Validator::make($request->all(), [
             'models' => 'required|array',
             'models.*.name' => 'required|in:' . implode(',', array_keys($this->syncableModels)),
@@ -118,18 +121,18 @@ class SyncController extends Controller
         }
 
         $results = [];
-        
+
         foreach ($request->models as $model) {
             $modelName = $model['name'];
             $modelClass = $this->syncableModels[$modelName];
-            
+
             $results[$modelName] = $this->syncService->getUnsyncedData(
                 $modelClass,
                 $model['synced_ids'] ?? [],
                 $model['last_sync'] ?? null
             );
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => $results,
@@ -141,6 +144,7 @@ class SyncController extends Controller
      */
     public function resolveConflict(Request $request)
     {
+        $this->authorize('create', \App\Models\Product::class);
         $validator = Validator::make($request->all(), [
             'model' => 'required|in:' . implode(',', array_keys($this->syncableModels)),
             'local_data' => 'required|array',
@@ -156,7 +160,7 @@ class SyncController extends Controller
         }
 
         $modelClass = $this->syncableModels[$request->model];
-        
+
         try {
             $result = $this->syncService->resolveConflict(
                 $modelClass,
@@ -164,13 +168,13 @@ class SyncController extends Controller
                 $request->server_data,
                 $request->resolution
             );
-            
+
             return response()->json([
                 'success' => $result['success'] ?? false,
                 'data' => $result['data'] ?? null,
                 'error' => $result['error'] ?? null,
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -184,6 +188,7 @@ class SyncController extends Controller
      */
     public function batchSync(Request $request)
     {
+        $this->authorize('create', \App\Models\Product::class);
         $validator = Validator::make($request->all(), [
             'sync_data' => 'required|array',
             'sync_data.*' => 'required|array',
@@ -199,14 +204,14 @@ class SyncController extends Controller
         }
 
         $syncData = [];
-        
+
         foreach ($request->sync_data as $item) {
             $modelClass = $this->syncableModels[$item['model']];
             $syncData[$modelClass] = $item['data'];
         }
-        
+
         $results = $this->syncService->batchSync($syncData);
-        
+
         return response()->json([
             'success' => true,
             'data' => $results,

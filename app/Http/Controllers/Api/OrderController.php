@@ -30,6 +30,7 @@ class OrderController extends Controller
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', Order::class);
         try {
             $orders = Order::with(['orderItems.product'])
                 ->latest('created_at')
@@ -74,6 +75,7 @@ class OrderController extends Controller
                     'message' => 'Pesanan tidak ditemukan'
                 ], 404);
             }
+            $this->authorize('view', $order);
 
             return response()->json([
                 'success' => true,
@@ -216,7 +218,9 @@ class OrderController extends Controller
                 if ($validatedData['payment_method'] !== 'cash') {
                     $order->midtrans_order_id = 'ORD-' . date('Ymd') . '-' . str_pad(
                         Order::whereDate('created_at', today())->count() + 1,
-                        4, '0', STR_PAD_LEFT
+                        4,
+                        '0',
+                        STR_PAD_LEFT
                     ) . '-' . $order->id;
                 } else {
                     // Ensure midtrans_order_id is null for cash payments
@@ -248,7 +252,6 @@ class OrderController extends Controller
                     'data' => $order->load('orderItems')
                 ], 201);
             });
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -267,6 +270,7 @@ class OrderController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Order::class);
         // Check if this is a simplified order request
         if ($request->has('transaction_time') && $request->has('order_items')) {
             return $this->processSimplifiedOrder($request);
@@ -491,6 +495,8 @@ class OrderController extends Controller
                 return response()->json($response, 404);
             }
 
+            $this->authorize('update', $order);
+
             $order->status = $request->status;
             $order->notes = $request->notes;
             $order->save();
@@ -511,6 +517,32 @@ class OrderController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null
             ];
             return response()->json($response, 500);
+        }
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $order = Order::find($id);
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pesanan tidak ditemukan'
+                ], 404);
+            }
+            $this->authorize('delete', $order);
+            $order->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil dihapus'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus pesanan: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus pesanan',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
     }
 }

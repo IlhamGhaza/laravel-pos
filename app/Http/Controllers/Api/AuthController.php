@@ -55,9 +55,15 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function profile(Request $request)
+    {
+        $this->authorize('view', $request->user());
+    }
+
     //logout
     public function logout(Request $request)
     {
+        $this->authorize('update', $request->user());
         $request->user()->tokens()->delete();
 
         return response()->json([

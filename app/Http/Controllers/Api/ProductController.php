@@ -81,11 +81,11 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $validated = $validator->validated();
-            
+
             // Handle image upload
             $imagePath = $request->file('image')->store('products', 'public');
             $validated['image'] = $imagePath;
-            
+
             $product = Product::create($validated);
             $product = Product::select('*', 'category_id')->find($product->id);
 

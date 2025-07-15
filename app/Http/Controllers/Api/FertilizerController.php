@@ -22,10 +22,11 @@ class FertilizerController extends Controller
      */
     public function checkExpiry(Request $request)
     {
+        $this->authorize('viewAny', Product::class);
         $daysBefore = $request->input('days_before', 30);
-        
+
         $result = $this->fertilizerService->checkProductExpiry($daysBefore);
-        
+
         return response()->json([
             'success' => true,
             'data' => $result,
@@ -37,6 +38,7 @@ class FertilizerController extends Controller
      */
     public function convertUnit(Request $request)
     {
+        $this->authorize('viewAny', Product::class);
         $validator = Validator::make($request->all(), [
             'value' => 'required|numeric|min:0',
             'from_unit' => 'required|string',
@@ -64,7 +66,7 @@ class FertilizerController extends Controller
                     'unit' => $request->to_unit,
                 ],
             ]);
-            
+
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
@@ -78,6 +80,7 @@ class FertilizerController extends Controller
      */
     public function getRecommendations(Request $request)
     {
+        $this->authorize('viewAny', Product::class);
         $validator = Validator::make($request->all(), [
             'plant_type' => 'required|string',
             'soil_type' => 'nullable|string',
@@ -108,6 +111,7 @@ class FertilizerController extends Controller
      */
     public function calculateRequirement(Request $request)
     {
+        $this->authorize('viewAny', Product::class);
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'area' => 'required|numeric|min:0.01',
@@ -132,7 +136,7 @@ class FertilizerController extends Controller
                 'success' => true,
                 'data' => $result,
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -146,6 +150,7 @@ class FertilizerController extends Controller
      */
     public function getAvailableUnits()
     {
+        $this->authorize('viewAny', Product::class);
         return response()->json([
             'success' => true,
             'data' => [
@@ -165,6 +170,7 @@ class FertilizerController extends Controller
      */
     public function getAreaUnits()
     {
+        $this->authorize('viewAny', Product::class);
         return response()->json([
             'success' => true,
             'data' => [

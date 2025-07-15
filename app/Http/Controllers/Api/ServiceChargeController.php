@@ -16,6 +16,7 @@ class ServiceChargeController extends Controller
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\ServiceCharge::class);
         try {
             $serviceCharges = ServiceCharge::all();
 
@@ -36,6 +37,7 @@ class ServiceChargeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\ServiceCharge::class);
         try {
             $validated = $request->validate([
                 'name' => 'required|string|min:3|max:255',
@@ -70,6 +72,7 @@ class ServiceChargeController extends Controller
      */
     public function show(ServiceCharge $serviceCharge): JsonResponse
     {
+        $this->authorize('view', $serviceCharge);
         return response()->json([
 
             'message' => 'Service charge retrieved successfully.',
@@ -82,6 +85,7 @@ class ServiceChargeController extends Controller
      */
     public function update(Request $request, ServiceCharge $serviceCharge): JsonResponse
     {
+        $this->authorize('update', $serviceCharge);
         try {
             $validated = $request->validate([
                 'name' => 'sometimes|required|string|min:3|max:255',
@@ -115,6 +119,7 @@ class ServiceChargeController extends Controller
      */
     public function destroy(ServiceCharge $serviceCharge): JsonResponse
     {
+        $this->authorize('delete', $serviceCharge);
         try {
             $serviceCharge->delete();
 

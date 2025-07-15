@@ -21,6 +21,7 @@ class MobileOrderSyncController extends Controller
 {
     public function syncAndStoreOrder(Request $request)
     {
+        $this->authorize('create', \App\Models\MobileSyncValidationIssue::class);
         $validator = Validator::make($request->all(), [
             'transaction_time' => 'required|date_format:Y-m-d H:i:s',
             'kasir_id' => 'required|exists:users,id',

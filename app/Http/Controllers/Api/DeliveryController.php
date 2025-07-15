@@ -16,6 +16,7 @@ class DeliveryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', \App\Models\Delivery::class);
         $deliveries = Delivery::with(['order', 'driver'])->get();
         return response()->json(['data' => $deliveries]);
     }
@@ -25,6 +26,7 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', \App\Models\Delivery::class);
         $validator = Validator::make($request->all(), [
             'order_id' => 'required|exists:orders,id',
             'driver_id' => 'required|exists:users,id',
@@ -84,6 +86,7 @@ class DeliveryController extends Controller
      */
     public function show(Delivery $delivery)
     {
+        $this->authorize('view', $delivery);
         return response()->json([
             'data' => $delivery->load(['order', 'driver', 'order.customer'])
         ]);
@@ -94,6 +97,7 @@ class DeliveryController extends Controller
      */
     public function update(Request $request, Delivery $delivery)
     {
+        $this->authorize('update', $delivery);
         $validator = Validator::make($request->all(), [
             'driver_id' => 'exists:users,id',
             'recipient_name' => 'string|max:255',
@@ -142,7 +146,7 @@ class DeliveryController extends Controller
         }
 
         $delivery->update($request->except(['status', 'dispatched_at', 'delivery_at']));
-        
+
         if ($request->has('status')) {
             $delivery->status = $request->status;
             $delivery->save();
@@ -159,6 +163,7 @@ class DeliveryController extends Controller
      */
     public function destroy(Delivery $delivery)
     {
+        $this->authorize('delete', $delivery);
         if ($delivery->status === Delivery::STATUS_DELIVERED) {
             return response()->json([
                 'message' => 'Cannot delete a completed delivery',
@@ -199,6 +204,7 @@ class DeliveryController extends Controller
      */
     public function markAsDelivered(Request $request, Delivery $delivery)
     {
+        $this->authorize('update', $delivery);
         $validator = Validator::make($request->all(), [
             'proof_of_delivery_image_path' => 'required|string',
             'notes' => 'nullable|string',

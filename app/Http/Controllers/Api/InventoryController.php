@@ -22,6 +22,7 @@ class InventoryController extends Controller
      */
     public function getStockStatus()
     {
+        $this->authorize('viewAny', \App\Models\InventoryLog::class);
         $stockStatus = $this->inventoryService->getStockStatus();
         return response()->json([
             'success' => true,
@@ -34,6 +35,7 @@ class InventoryController extends Controller
      */
     public function getStockHistory($productId, Request $request)
     {
+        $this->authorize('viewAny', \App\Models\InventoryLog::class);
         $validator = Validator::make([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -63,6 +65,7 @@ class InventoryController extends Controller
      */
     public function adjustInventory(Request $request)
     {
+        $this->authorize('create', \App\Models\InventoryLog::class);
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|numeric|not_in:0',
@@ -79,7 +82,7 @@ class InventoryController extends Controller
         }
 
         $product = Product::find($request->product_id);
-        
+
         try {
             $log = $this->inventoryService->updateStock(
                 $product,
@@ -99,7 +102,7 @@ class InventoryController extends Controller
                     'current_stock' => $product->fresh()->stock_quantity,
                 ],
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -114,6 +117,7 @@ class InventoryController extends Controller
      */
     public function getLowStockAlerts()
     {
+        $this->authorize('viewAny', \App\Models\InventoryLog::class);
         $products = Product::whereColumn('stock_quantity', '<=', 'minimum_stock_level')
             ->where('stock_quantity', '>', 0)
             ->get();
@@ -129,6 +133,7 @@ class InventoryController extends Controller
      */
     public function getOutOfStock()
     {
+        $this->authorize('viewAny', \App\Models\InventoryLog::class);
         $products = Product::where('stock_quantity', '<=', 0)
             ->get();
 
