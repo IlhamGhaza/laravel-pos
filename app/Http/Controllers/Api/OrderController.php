@@ -66,6 +66,7 @@ class OrderController extends Controller
      */
     public function show($id): JsonResponse
     {
+        $this->authorize('view', Order::class);
         try {
             $order = Order::with(['orderItems.product'])->find($id);
 
@@ -107,6 +108,7 @@ class OrderController extends Controller
      */
     private function processSimplifiedOrder(Request $request): JsonResponse
     {
+        $this->authorize('create', Order::class);
         try {
             // Validate the request data
             $validatedData = $request->validate([
@@ -231,11 +233,16 @@ class OrderController extends Controller
 
                 // Create order items
                 foreach ($validatedData['order_items'] as $item) {
-                    $product = \App\Models\Product::find($item['product_id']);
+                    // Ambil nama produk dari product_id pada item
+                    $productName = null;
+                    if (!empty($item['product_id'])) {
+                        $product = \App\Models\Product::find($item['product_id']);
+                        $productName = $product ? $product->name : 'Nama Product';
+                    }
 
                     $order->orderItems()->create([
                         'product_id' => $item['product_id'],
-                        'product_name' => $product ? $product->name : 'Unknown Product',
+                        'product_name' => $productName,
                         'quantity' => $item['quantity'],
                         'price' => $item['price'],
                         'total_price' => $item['quantity'] * $item['price']
@@ -385,12 +392,16 @@ class OrderController extends Controller
                 $subTotal = 0;
 
                 foreach ($validatedData['order_items'] as $item) {
-                    // Get the product to get its name
-                    $product = \App\Models\Product::find($item['product_id']);
+                    // Ambil nama produk dari product_id pada item
+                    $productName = null;
+                    if (!empty($item['product_id'])) {
+                        $product = \App\Models\Product::find($item['product_id']);
+                        $productName = $product ? $product->name : 'Nama Product';
+                    }
 
                     $orderItem = $order->orderItems()->create([
                         'product_id' => $item['product_id'],
-                        'product_name' => $product ? $product->name : null,
+                        'product_name' => $productName,
                         'price' => $item['price'],
                         'total_price' => $item['quantity'] * $item['price']
                     ]);
@@ -468,6 +479,7 @@ class OrderController extends Controller
     //  */
     public function updateStatus(Request $request, $id): JsonResponse
     {
+        $this->authorize('update', Order::class);
         $response = [];
 
         try {
@@ -522,6 +534,7 @@ class OrderController extends Controller
 
     public function destroy($id): JsonResponse
     {
+        $this->authorize('delete', Order::class);
         try {
             $order = Order::find($id);
             if (!$order) {

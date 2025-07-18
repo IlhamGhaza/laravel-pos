@@ -31,13 +31,18 @@ class CustomerController extends Controller
         $this->authorize('create', Customer::class);
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:100',
                 'email' => 'nullable|email|unique:customers,email',
                 'phone_number' => 'nullable|string|max:20|unique:customers,phone_number',
                 'address' => 'nullable|string',
+                'city' => 'nullable|string|max:255',
+                'state' => 'nullable|string|max:255',
+                'postal_code' => 'nullable|string|max:255',
+                'customer_type' => 'nullable|in:regular,wholesale,reseller,non-member',
             ], [
                 'phone_number.unique' => 'Nomor telepon sudah digunakan oleh pelanggan lain.',
-                'email.unique' => 'Email sudah digunakan oleh pelanggan lain.'
+                'email.unique' => 'Email sudah digunakan oleh pelanggan lain.',
+                'customer_type.in' => 'Tipe pelanggan tidak valid.'
             ]);
 
             if ($validator->fails()) {
@@ -87,13 +92,18 @@ class CustomerController extends Controller
         $this->authorize('update', $customer);
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
+                'name' => 'sometimes|required|string|max:100',
                 'email' => 'nullable|email|unique:customers,email,' . $customer->id,
                 'phone_number' => 'nullable|string|max:20|unique:customers,phone_number,' . $customer->id,
                 'address' => 'nullable|string',
+                'city' => 'nullable|string|max:255',
+                'state' => 'nullable|string|max:255',
+                'postal_code' => 'nullable|string|max:255',
+                'customer_type' => 'nullable|in:regular,wholesale,reseller,non-member',
             ], [
                 'phone_number.unique' => 'Nomor telepon sudah digunakan oleh pelanggan lain.',
-                'email.unique' => 'Email sudah digunakan oleh pelanggan lain.'
+                'email.unique' => 'Email sudah digunakan oleh pelanggan lain.',
+                'customer_type.in' => 'Tipe pelanggan tidak valid.'
             ]);
 
             if ($validator->fails()) {

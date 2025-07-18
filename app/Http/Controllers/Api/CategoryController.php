@@ -81,6 +81,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
+        $this->authorize('view', Category::class);
         $category = Category::find($id);
 
         if (!$category) {
@@ -107,6 +108,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->authorize('update', Category::class);
         try {
             $category = Category::find($id);
             $response = [];
@@ -172,6 +174,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
+        $this->authorize('delete', Category::class);
         try {
             $category = Category::find($id);
             $response = [];

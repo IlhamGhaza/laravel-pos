@@ -307,6 +307,7 @@ class DiscountController extends Controller
      */
     public function todayDiscounts()
     {
+        $this->authorize('viewAny', Discount::class);
         try {
             $discounts = Discount::with('validDays')
                 ->validToday()
@@ -339,6 +340,7 @@ class DiscountController extends Controller
      */
     public function sync()
     {
+        $this->authorize('viewAny', Discount::class);
         try {
             $discounts = Discount::with('validDays')
                 ->activeForSync()

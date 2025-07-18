@@ -11,7 +11,7 @@ class DiscountSeeder extends Seeder
 {
     public function run(): void
     {
-        Discount::factory()->count(25)->create();
+        // Discount::factory()->count(25)->create();
         // 1. Diskon Member (berlaku setiap hari)
         $discount1 = Discount::create([
             'name' => 'Diskon Member 5%',

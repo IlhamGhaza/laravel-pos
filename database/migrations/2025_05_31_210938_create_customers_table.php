@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('postal_code')->nullable();
-            $table->enum('customer_type', ['regular', 'wholesale', 'reseller'])->nullable()->default('regular');
+            $table->enum('customer_type', ['regular', 'wholesale', 'reseller', 'non-member'])->nullable()->default('regular');
             $table->timestamps();
             $table->softDeletes();
 

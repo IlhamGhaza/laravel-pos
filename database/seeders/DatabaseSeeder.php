@@ -35,13 +35,13 @@ class DatabaseSeeder extends Seeder
         ]);
         //DiscountSeeder class
         $this->call([
-            // CategorySeeder::class,
-            // ProductSeeder::class,
-            //    DiscountSeeder::class,
+            CategorySeeder::class,
+            ProductSeeder::class,
+            DiscountSeeder::class,
             ServiceChargeSeeder::class,
             TaxSeeder::class,
-            // SupplierSeeder::class,
-            // CustomerSeeder::class,
+            SupplierSeeder::class,
+            CustomerSeeder::class,
         ]);
     }
 }

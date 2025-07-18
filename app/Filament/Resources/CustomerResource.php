@@ -48,6 +48,7 @@ class CustomerResource extends Resource
                         'regular' => 'Regular',
                         'wholesale' => 'Wholesale',
                         'reseller' => 'Reseller',
+                        'non-member' => 'Non-Member',
                     ]),
             ]);
     }
@@ -89,6 +90,7 @@ class CustomerResource extends Resource
                             'regular' => 'primary',
                             'wholesale' => 'warning',
                             'reseller' => 'danger',
+                            
                         };
                     })
                     ->sortable(),
