@@ -10,7 +10,7 @@
 For the fastest setup, use the automated deployment script:
 
 ```bash
-wget https://raw.githubusercontent.com/IlhamGhaza/laravel-pos/diskon/deploy-pos.sh
+wget https://raw.githubusercontent.com/IlhamGhaza/laravel-pos/pupuk/deploy-pos.sh
 chmod +x deploy-pos.sh
 sudo ./deploy-pos.sh myposs.ilhamghazali.my.id m.ilhamghazali@gmail.com
 ```

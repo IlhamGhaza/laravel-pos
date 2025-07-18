@@ -359,8 +359,8 @@ server {
         deny all;
     }
 
-    # Deny access to storage and bootstrap/cache
-    location ~ ^/(storage|bootstrap/cache)/ {
+    # Deny access to bootstrap/cache
+    location ~ ^/bootstrap/cache/ {
         deny all;
     }
 
