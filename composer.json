@@ -16,7 +16,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "midtrans/midtrans-php": "^2.6",
-        "resend/resend-php": "^0.13.0"
+        "resend/resend-php": "^0.13.0",
+        "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
         "laravel/pint": "^1.13",

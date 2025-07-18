@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends Resource
 {
@@ -29,6 +30,8 @@ class OrderResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('kasir_id')
                     ->relationship('kasir', 'name')
+                    ->default(fn() => Auth::user()?->getKey())
+                    ->disabled()
                     ->required(),
                 Forms\Components\Select::make('customer_id')
                     ->relationship('customer', 'name'),
@@ -72,7 +75,7 @@ class OrderResource extends Resource
                 Forms\Components\TextInput::make('total_item')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('payment_method')
+                Forms\Components\Select::make('payment_method')
                     ->required()
                     ->options([
                         'Cash' => 'Cash',
@@ -81,12 +84,17 @@ class OrderResource extends Resource
                         'Transfer' => 'Transfer',
                         'E-Wallet' => 'E-Wallet',
                         'QRIS' => 'QRIS',
+                    ]),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'processing' => 'Processing',
+                        'completed' => 'Completed',
+                        'cancelled' => 'Cancelled',
+                        'paid' => 'Paid',
+                        'failed' => 'Failed',
                     ])
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(50)
-                    ->default('pending'),
+                    ->required(),
                 Forms\Components\TextInput::make('midtrans_transaction_id')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('midtrans_order_id')
@@ -106,6 +114,28 @@ class OrderResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('service_charge_id')
                     ->numeric(),
+                Forms\Components\Repeater::make('orderItems')
+                    ->relationship('orderItems')
+                    ->schema([
+                        Forms\Components\Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('product_name')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('quantity')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('price')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('total_price')
+                            ->required()
+                            ->numeric(),
+                    ])
+                    ->columnSpanFull()
+                    ->label('Items')
+                    ->addActionLabel('Tambah Item')
+                    ->collapsible(),
             ]);
     }
 

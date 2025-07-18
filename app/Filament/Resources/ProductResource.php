@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\ViewColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -87,7 +88,7 @@ class ProductResource extends Resource
                     ->toggleable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image')
-                    ->getStateUsing(fn ($record) => $record->image ? asset('storage/products/'.ltrim($record->image, '/')) : null)
+                    ->getStateUsing(fn($record) => $record->image ? asset('storage/products/' . ltrim($record->image, '/')) : null)
                     ->disk('products')
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('is_best_seller')
@@ -106,6 +107,10 @@ class ProductResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                ViewColumn::make('qr')
+                    ->label('QR')
+                    ->view('filament.tables.columns.qr-code')
+                    ->extraAttributes(['style' => 'width:80px']),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

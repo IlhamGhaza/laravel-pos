@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderResource extends Resource
 {
@@ -30,6 +31,8 @@ class PurchaseOrderResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
+                    ->default(fn() => Auth::user()?->getKey())
+                    ->disabled()
                     ->required(),
                 Forms\Components\TextInput::make('po_number')
                     ->required()
@@ -38,12 +41,43 @@ class PurchaseOrderResource extends Resource
                     ->required(),
                 Forms\Components\DatePicker::make('expected_delivery_date'),
                 Forms\Components\DatePicker::make('received_date'),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'ordered' => 'Ordered',
+                        'partially_received' => 'Partially Received',
+                        'received' => 'Received',
+                        'cancelled' => 'Cancelled',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('total_amount')
                     ->numeric(),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
+                Forms\Components\Repeater::make('purchaseOrderItems')
+                    ->relationship('purchaseOrderItems')
+                    ->schema([
+                        Forms\Components\Select::make('product_id')
+                            ->relationship('product', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('quantity_ordered')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('quantity_received')
+                            ->required()
+                            ->numeric()
+                            ->default(0.00),
+                        Forms\Components\TextInput::make('unit_cost_price')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('subtotal')
+                            ->required()
+                            ->numeric(),
+                    ])
+                    ->columnSpanFull()
+                    ->label('Items')
+                    ->addActionLabel('Tambah Item')
+                    ->collapsible(),
             ]);
     }
 
