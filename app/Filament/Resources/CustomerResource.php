@@ -90,8 +90,9 @@ class CustomerResource extends Resource
                             'regular' => 'primary',
                             'wholesale' => 'warning',
                             'reseller' => 'danger',
-                            
+                            default => 'secondary',
                         };
+
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
