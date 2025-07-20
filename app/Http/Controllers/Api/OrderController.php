@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Tax;
 use App\Models\ServiceCharge;
 use App\Models\Discount;
+use App\Models\Payment;
 use App\Services\DiscountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -253,6 +254,17 @@ class OrderController extends Controller
                 $order->calculateTotals();
                 $order->save();
 
+                // Tambahkan logic: buat payment otomatis setelah order dibuat
+                $paymentStatus = $validatedData['payment_method'] === Payment::METHOD_CASH ? Payment::STATUS_PAID : Payment::STATUS_PENDING;
+                $paidAt = $validatedData['payment_method'] === Payment::METHOD_CASH ? now() : null;
+                Payment::create([
+                    'order_id' => $order->id,
+                    'amount' => $order->total_price ?? $order->payment_amount,
+                    'payment_method' => $validatedData['payment_method'],
+                    'status' => $paymentStatus,
+                    'paid_at' => $paidAt,
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Order created successfully',
@@ -440,6 +452,17 @@ class OrderController extends Controller
                 }
                 $order->service_charge = $order->service_charge ?? 0; // Ensure service charge is set to 0 if null
                 $order->save();
+
+                // Tambahkan logic: buat payment otomatis setelah order dibuat
+                $paymentStatus = $validatedData['payment_method'] === Payment::METHOD_CASH ? Payment::STATUS_PAID : Payment::STATUS_PENDING;
+                $paidAt = $validatedData['payment_method'] === Payment::METHOD_CASH ? now() : null;
+                Payment::create([
+                    'order_id' => $order->id,
+                    'amount' => $order->total_price ?? $order->payment_amount,
+                    'payment_method' => $validatedData['payment_method'],
+                    'status' => $paymentStatus,
+                    'paid_at' => $paidAt,
+                ]);
 
                 return $order;
             });
