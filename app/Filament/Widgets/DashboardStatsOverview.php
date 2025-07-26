@@ -13,12 +13,17 @@ class DashboardStatsOverview extends BaseWidget
 {
     protected static ?int $sort = 1;
 
+    public static function canView(): bool
+    {
+        return auth()->user()->can('widget_DashboardStatsOverview');
+    }
+
     protected function getStats(): array
     {
         $today = Carbon::today();
 
         $totalSalesToday = Order::whereDate('transaction_time', $today)
-            ->where('status', '!=', 'cancelled') // Asumsi status 'cancelled' tidak dihitung
+            ->where('status', '!=', 'cancelled')
             ->sum('total_price');
 
         $totalOrdersToday = Order::whereDate('transaction_time', $today)->count();

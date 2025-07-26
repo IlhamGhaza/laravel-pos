@@ -127,7 +127,7 @@ server {
         deny all;
     }
 
-    location ~ ^/(storage|bootstrap/cache)/ {
+    location ~ ^/bootstrap/cache/ {
         deny all;
     }
 

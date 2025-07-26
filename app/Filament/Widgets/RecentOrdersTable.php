@@ -13,6 +13,11 @@ class RecentOrdersTable extends BaseWidget
     protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return auth()->user()->can('widget_RecentOrdersTable');
+    }
+
     public function table(Table $table): Table
     {
         return $table

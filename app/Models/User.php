@@ -5,8 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel as FilamentPanel;
-use Filament\Tables\Columns\Layout\Panel;
+use Filament\Panel;
+// use Filament\Tables\Columns\Layout\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,13 +14,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable,HasApiTokens,HasRoles, SoftDeletes;
-     public function canAccessPanel(FilamentPanel $panel): bool
+     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->email === 'ilham@admin.com';
+        return true;
     }
 
     /**
