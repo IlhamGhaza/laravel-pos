@@ -30,7 +30,9 @@ class ProductController extends Controller
     {
         try {
             $this->authorize('viewAny', Product::class);
-            $products = Product::select('*', 'category_id')->get();
+            $products = Product::select('*', 'category_id')
+                ->where('isReady', true)
+                ->get();
 
             return response()->json([
                 'success' => true,
