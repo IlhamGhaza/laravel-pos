@@ -32,6 +32,7 @@ class ProductController extends Controller
             $this->authorize('viewAny', Product::class);
             $products = Product::select('*', 'category_id')
                 ->where('isReady', true)
+                ->where('stock', '!=', 0)
                 ->get();
 
             return response()->json([

@@ -40,7 +40,7 @@ class CategoryController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255|unique:categories,name',
-                'description' => 'nullable|string',
+                // 'description' => 'nullable|string',
             ], [
                 'name.unique' => 'Nama kategori sudah digunakan',
                 'name.required' => 'Nama kategori wajib diisi',
@@ -81,7 +81,6 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $this->authorize('view', Category::class);
         $category = Category::find($id);
 
         if (!$category) {
@@ -108,7 +107,6 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorize('update', Category::class);
         try {
             $category = Category::find($id);
             $response = [];
@@ -129,7 +127,7 @@ class CategoryController extends Controller
                     'max:255',
                     Rule::unique('categories', 'name')->ignore($category->id)
                 ],
-                'description' => 'nullable|string',
+                // 'description' => 'nullable|string',
             ], [
                 'name.unique' => 'Nama kategori sudah digunakan',
                 'name.required' => 'Nama kategori wajib diisi',
@@ -174,7 +172,6 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $this->authorize('delete', Category::class);
         try {
             $category = Category::find($id);
             $response = [];
@@ -202,7 +199,7 @@ class CategoryController extends Controller
             $response = [
                 'success' => true,
                 'message' => 'Kategori berhasil dihapus',
-                'data' => null
+                // 'data' => null
             ];
 
             return response()->json($response);

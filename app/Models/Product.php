@@ -16,7 +16,7 @@ class Product extends Model
         'name',
         'description',
         'price',
-        // 'stock',
+        'stock',
         'category_id',
         'image',
         'is_best_seller',
@@ -28,7 +28,7 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
-        // 'stock' => 'decimal:2',
+        'stock' => 'decimal:2',
         'is_best_seller' => 'boolean',
         'isReady' => 'boolean',
     ];
