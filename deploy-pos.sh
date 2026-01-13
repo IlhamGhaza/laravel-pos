@@ -140,10 +140,10 @@ install_software() {
 
     # Install PHP and extensions
     print_status "Installing PHP and extensions..."
-    apt install -y php8.3 php8.3-fpm php8.3-cli php8.3-common php8.3-pgsql php8.3-zip php8.3-gd php8.3-mbstring php8.3-curl php8.3-xml php8.3-bcmath php8.3-intl
+    apt install -y php8.4 php8.4-fpm php8.4-cli php8.4-common php8.4-pgsql php8.4-zip php8.4-gd php8.4-mbstring php8.4-curl php8.4-xml php8.4-bcmath php8.4-intl
     # Start and enable PHP-FPM
-    systemctl start php8.3-fpm
-    systemctl enable php8.3-fpm
+    systemctl start php8.4-fpm
+    systemctl enable php8.4-fpm
 
     # Install Composer
     if ! command_exists composer; then
@@ -288,15 +288,10 @@ setup_environment() {
 setup_laravel() {
     print_status "Setting up Laravel application..."
 
-    # Remove composer.lock to regenerate with PHP 8.3-compatible dependencies
-    # This avoids Symfony 8.x packages that require PHP 8.4
-    if [ -f "composer.lock" ]; then
-        print_status "Removing composer.lock to regenerate with PHP 8.3-compatible dependencies..."
-        rm -f composer.lock
-    fi
-
-    # Install dependencies (will regenerate composer.lock with PHP 8.3-compatible versions)
-    sudo -u www-data composer install --optimize-autoloader --no-interaction
+    # Install dependencies
+    # sudo -u www-data composer install --no-dev --optimize-autoloader
+    sudo -u www-data composer install --optimize-autoloader
+    sudo -u www-data composer update --no-interaction
 
     # Generate application key
     sudo -u www-data php artisan key:generate
@@ -354,7 +349,7 @@ server {
     # Handle PHP files
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
     }
@@ -439,7 +434,7 @@ verify_deployment() {
     fi
 
     # Check if PHP-FPM is running
-    if systemctl is-active --quiet php8.3-fpm; then
+    if systemctl is-active --quiet php8.4-fpm; then
         print_success "PHP-FPM is running"
     else
         print_error "PHP-FPM is not running"
@@ -477,9 +472,9 @@ show_final_info() {
     echo ""
     echo "Useful commands:"
     echo "📊 Check Nginx status: systemctl status nginx"
-    echo "📊 Check PHP-FPM status: systemctl status php8.3-fpm"
+    echo "📊 Check PHP-FPM status: systemctl status php8.4-fpm"
     echo "📝 View Nginx logs: tail -f /var/log/nginx/error.log"
-    echo "🔄 Restart services: systemctl restart nginx php8.3-fpm"
+    echo "🔄 Restart services: systemctl restart nginx php8.4-fpm"
     echo "🔒 SSL renewal: certbot renew"
     echo ""
     echo "Security features enabled:"
