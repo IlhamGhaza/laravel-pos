@@ -63,4 +63,14 @@ class PurchaseOrder extends Model
         $this->total_amount = $this->purchaseOrderItems()->sum('subtotal'); // Menggunakan kolom 'subtotal' dari migrasi purchase_order_items
         $this->save();
     }
+
+    /**
+     * Generate unique PO number with format: PO-YYYYMMDD-XXXX
+     */
+    public static function generatePoNumber(): string
+    {
+        $date = now()->format('Ymd');
+        $count = self::whereDate('created_at', today())->count() + 1;
+        return "PO-{$date}-" . str_pad($count, 4, '0', STR_PAD_LEFT);
+    }
 }

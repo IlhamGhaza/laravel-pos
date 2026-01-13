@@ -63,11 +63,16 @@ class PurchaseOrderItem extends Model
                 $item->purchaseOrder->calculateTotal();
             }
 
-            // Buat Inventory Log jika quantity_received berubah dan positif (menandakan penerimaan)
-            // Diasumsikan 'quantity_received' adalah pemicu stok masuk.
-            // Perhatikan: Jika 'quantity_received' bisa diupdate berkali-kali (penerimaan parsial),
-            // logika 'quantityChange' ini penting.
-            if ($item->isDirty('quantity_received') && $item->quantity_received > 0) {
+            // Buat Inventory Log dan update stock jika:
+            // 1. quantity_received berubah dan positif
+            // 2. Status PO adalah 'partially_received' atau 'received'
+            $validStatuses = ['partially_received', 'received'];
+            
+            if ($item->isDirty('quantity_received') && 
+                $item->quantity_received > 0 && 
+                $item->purchaseOrder && 
+                in_array($item->purchaseOrder->status, $validStatuses)) {
+                
                 $originalQuantityReceived = $item->getOriginal('quantity_received') ?? 0;
                 $quantityChange = $item->quantity_received - $originalQuantityReceived;
 
@@ -75,21 +80,19 @@ class PurchaseOrderItem extends Model
                     InventoryLog::create([
                         'product_id' => $item->product_id,
                         'purchase_order_item_id' => $item->id,
-                        //user_id = current user saat ubah
-                        'user_id' =>auth()->user_id,
-                        'type' => InventoryLog::TYPE_RESTOCK, // Atau tipe yang lebih spesifik seperti 'purchase_receipt'
+                        'user_id' => auth()->id(),
+                        'type' => InventoryLog::TYPE_RESTOCK,
                         'quantity_change' => $quantityChange,
-                        // 'stock_before_change' => null, // Isi jika relevan dan bisa didapatkan
-                        // 'stock_after_change' => null,  // Isi jika relevan dan bisa didapatkan
                         'reason' => 'Penerimaan barang untuk PO: ' . ($item->purchaseOrder->po_number ?? 'N/A'),
                     ]);
 
-                    // Jika aplikasi ini MENGELOLA stok secara lokal (yang mana TIDAK sesuai skenario kita):
-                    // if ($item->product) {
-                    //     $item->product->addStock($quantityChange);
-                    // }
+                    // Update stock on Product
+                    if ($item->product) {
+                        $item->product->addStock($quantityChange);
+                    }
                 }
             }
         });
     }
 }
+

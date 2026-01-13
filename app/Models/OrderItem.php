@@ -81,30 +81,8 @@ class OrderItem extends Model
             if ($orderItem->order) { // Pastikan relasi order ada
                 $orderItem->order->calculateTotals(); // Ini sudah memanggil save() di model Order
             }
-
-            // Buat Inventory Log ketika OrderItem baru dibuat dan status Order relevan (misal: paid, completed)
-            // Kondisi ini penting agar log tidak dibuat untuk order yang masih draft atau dibatalkan.
-            // Cara yang lebih robust mungkin menggunakan OrderObserver pada perubahan status order.
-            // Namun, untuk contoh ini, kita periksa saat OrderItem disimpan.
-            if ($orderItem->wasRecentlyCreated && $orderItem->order &&
-                in_array($orderItem->order->status, [Order::STATUS_PAID, Order::STATUS_COMPLETED, Order::STATUS_PROCESSING])) {
-
-                InventoryLog::create([
-                    'product_id' => $orderItem->product_id,
-                    'order_item_id' => $orderItem->id,
-                    'user_id' => $orderItem->order->kasir_id ?? auth()->user_id, // Ambil kasir_id dari order
-                    'type' => InventoryLog::TYPE_SALE,
-                    'quantity_change' => -$orderItem->quantity, // Negatif untuk pengurangan stok
-                    // 'stock_before_change' => null, // Isi jika relevan
-                    // 'stock_after_change' => null,  // Isi jika relevan
-                    'reason' => 'Penjualan untuk Order ID: ' . $orderItem->order_id,
-                ]);
-
-                // Jika aplikasi ini MENGELOLA stok (yang mana TIDAK):
-                // if ($orderItem->product) {
-                //     $orderItem->product->reduceStock($orderItem->quantity);
-                // }
-            }
+            // InventoryLog creation is handled by OrderItemObserver
         });
     }
 }
+

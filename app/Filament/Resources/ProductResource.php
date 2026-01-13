@@ -39,9 +39,11 @@ class ProductResource extends Resource
                     ->default(0)
                     ->prefix('Rp'),
                 Forms\Components\TextInput::make('stock')
-                    ->required()
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->helperText('Stock dikelola otomatis dari Purchase Order dan Order'),
                 Forms\Components\Select::make('category_id')
                     ->relationship('category', 'name')
                     ->required()

@@ -24,6 +24,11 @@ class OrderItemObserver
             'quantity_change' => -$orderItem->quantity, // Negative for sale
             'reason' => "Sale from order #{$orderItem->order_id}"
         ]);
+
+        // Reduce stock on Product
+        if ($orderItem->product) {
+            $orderItem->product->reduceStock($orderItem->quantity);
+        }
     }
 
     /**
@@ -31,7 +36,7 @@ class OrderItemObserver
      */
     public function updated(OrderItem $orderItem): void
     {
-        // If quantity changed, create adjustment log
+        // If quantity changed, create adjustment log and adjust stock
         if ($orderItem->wasChanged('quantity')) {
             $oldQuantity = $orderItem->getOriginal('quantity');
             $newQuantity = $orderItem->quantity;
@@ -47,6 +52,17 @@ class OrderItemObserver
                     'quantity_change' => -$difference, // Negative for additional sale
                     'reason' => "Order item quantity adjusted from {$oldQuantity} to {$newQuantity}"
                 ]);
+
+                // Adjust stock on Product
+                if ($orderItem->product) {
+                    if ($difference > 0) {
+                        // More quantity ordered, reduce stock
+                        $orderItem->product->reduceStock($difference);
+                    } else {
+                        // Less quantity ordered, restore stock
+                        $orderItem->product->addStock(abs($difference));
+                    }
+                }
             }
         }
     }
@@ -66,5 +82,11 @@ class OrderItemObserver
             'quantity_change' => $orderItem->quantity, // Positive for return
             'reason' => "Order item deleted/returned from order #{$orderItem->order_id}"
         ]);
+
+        // Restore stock on Product
+        if ($orderItem->product) {
+            $orderItem->product->addStock($orderItem->quantity);
+        }
     }
 }
+

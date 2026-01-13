@@ -31,10 +31,14 @@ class PurchaseOrderResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
-                    ->default(fn() => Auth::user()?->getKey())
+                    ->default(fn() => Auth::id())
                     ->disabled()
+                    ->dehydrated(true) // Ensure value is submitted even when disabled
                     ->required(),
                 Forms\Components\TextInput::make('po_number')
+                    ->default(fn() => \App\Models\PurchaseOrder::generatePoNumber())
+                    ->disabled()
+                    ->dehydrated(true)
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('order_date')
@@ -62,17 +66,27 @@ class PurchaseOrderResource extends Resource
                             ->required(),
                         Forms\Components\TextInput::make('quantity_ordered')
                             ->required()
-                            ->numeric(),
+                            ->numeric()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($state, Forms\Set $set, Forms\Get $get) => 
+                                $set('subtotal', (float)$state * (float)($get('unit_cost_price') ?? 0))
+                            ),
                         Forms\Components\TextInput::make('quantity_received')
                             ->required()
                             ->numeric()
-                            ->default(0.00),
+                            ->default(0),
                         Forms\Components\TextInput::make('unit_cost_price')
                             ->required()
-                            ->numeric(),
+                            ->numeric()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($state, Forms\Set $set, Forms\Get $get) => 
+                                $set('subtotal', (float)($get('quantity_received') ?? 0) * (float)$state)
+                            ),
                         Forms\Components\TextInput::make('subtotal')
-                            ->required()
-                            ->numeric(),
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(true)
+                            ->default(0),
                     ])
                     ->columnSpanFull()
                     ->label('Items')

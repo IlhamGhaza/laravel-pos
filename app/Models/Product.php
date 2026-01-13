@@ -16,7 +16,7 @@ class Product extends Model
         'name',
         'description',
         'price',
-        'stock',
+        // 'stock' removed - managed automatically via PurchaseOrder and Order
         'category_id',
         'image',
         'is_best_seller',
@@ -90,4 +90,27 @@ class Product extends Model
     /**
      * Business Logic
      */
+
+    /**
+     * Add stock to the product
+     *
+     * @param float $quantity The quantity to add
+     * @return void
+     */
+    public function addStock(float $quantity): void
+    {
+        $this->increment('stock', $quantity);
+    }
+
+    /**
+     * Reduce stock from the product
+     *
+     * @param float $quantity The quantity to reduce
+     * @return void
+     */
+    public function reduceStock(float $quantity): void
+    {
+        $this->decrement('stock', $quantity);
+    }
 }
+
