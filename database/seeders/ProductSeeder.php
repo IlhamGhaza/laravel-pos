@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ProductSeeder extends Seeder
 {
@@ -22,14 +23,14 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        // Disable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // Disable foreign key checks (works for MySQL, PostgreSQL, SQLite)
+        Schema::disableForeignKeyConstraints();
 
         // Clear existing products
         Product::truncate();
 
         // Re-enable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        Schema::enableForeignKeyConstraints();
 
         // Ensure the storage link exists
         $publicPath = public_path('storage/products');
