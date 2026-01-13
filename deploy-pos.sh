@@ -288,10 +288,15 @@ setup_environment() {
 setup_laravel() {
     print_status "Setting up Laravel application..."
 
-    # Install dependencies
-    # sudo -u www-data composer install --no-dev --optimize-autoloader
-    sudo -u www-data composer install --optimize-autoloader
-    sudo -u www-data composer update --no-interaction
+    # Remove composer.lock to regenerate with PHP 8.3-compatible dependencies
+    # This avoids Symfony 8.x packages that require PHP 8.4
+    if [ -f "composer.lock" ]; then
+        print_status "Removing composer.lock to regenerate with PHP 8.3-compatible dependencies..."
+        rm -f composer.lock
+    fi
+
+    # Install dependencies (will regenerate composer.lock with PHP 8.3-compatible versions)
+    sudo -u www-data composer install --optimize-autoloader --no-interaction
 
     # Generate application key
     sudo -u www-data php artisan key:generate
